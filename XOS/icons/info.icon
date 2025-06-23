@@ -1,0 +1,7 @@
+return {
+  {colors.white, colors.white, colors.white, colors.white, colors.white},
+  {colors.blue, colors.black, colors.black, colors.black, colors.blue},
+  {colors.blue, colors.black, colors.white, colors.black, colors.blue},
+  {colors.blue, colors.black, colors.black, colors.black, colors.blue},
+  {colors.blue, colors.blue, colors.blue, colors.blue, colors.blue},
+}
