@@ -33,7 +33,7 @@ end
 local function drawBottomBar()
   term.setBackgroundColor(colors.gray)
   term.setCursorPos(1, screenH)
-  term.write("  [Home]        [Zurück]")
+  term.write("  [Home]        [Back]")
 end
 
 local function drawHomeScreen()
