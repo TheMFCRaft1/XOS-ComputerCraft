@@ -1,13 +1,13 @@
 -- /XOS/lib/gui.lua
 
 local buttons = {}
-local clickAreas = {}
+local areas = {}
 
 function clear(bg)
   term.setBackgroundColor(bg or colors.black)
   term.clear()
   buttons = {}
-  clickAreas = {}
+  areas = {}
 end
 
 function drawButton(x, y, w, h, label, callback)
@@ -38,7 +38,11 @@ function drawAppIcon(x, y, icon, label)
 end
 
 function registerArea(x, y, w, h, callback)
-  table.insert(clickAreas, {x = x, y = y, w = w, h = h, cb = callback})
+  table.insert(areas, {x = x, y = y, w = w, h = h, cb = callback})
+end
+
+function clearAreas()
+  areas = {}
 end
 
 function handleClick(px, py)
@@ -48,14 +52,10 @@ function handleClick(px, py)
       return
     end
   end
-  for _, area in ipairs(clickAreas) do
+  for _, area in ipairs(areas) do
     if px >= area.x and px < area.x + area.w and py >= area.y and py < area.y + area.h then
       area.cb()
       return
     end
   end
-end
-
-function clearAreas()
-  clickAreas = {}
 end
