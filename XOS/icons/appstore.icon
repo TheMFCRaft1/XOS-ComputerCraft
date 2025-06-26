@@ -1,8 +1,8 @@
 -- /XOS/icons/appstore.icon
 return {
-  {colors.white, colors.black, colors.black, colors.black, colors.white}, -- Henkel
-  {colors.blue,  colors.blue,  colors.blue,  colors.blue,  colors.blue},  -- obere Tasche
-  {colors.blue,  colors.white, colors.white, colors.white, colors.blue},  -- mittig heller Bereich
-  {colors.blue,  colors.white, colors.white, colors.white, colors.blue},
-  {colors.blue,  colors.blue,  colors.blue,  colors.blue,  colors.blue},
+  {colors.white,    colors.lightGray, colors.lightGray, colors.lightGray, colors.white},
+  {colors.white,    colors.lightGray, colors.white,     colors.lightGray, colors.white},
+  {colors.lightGray,colors.lightGray, colors.lightGray, colors.lightGray, colors.lightGray},
+  {colors.lightGray,colors.lightGray, colors.lightGray, colors.lightGray, colors.lightGray},
+  {colors.white,    colors.lightGray, colors.lightGray, colors.lightGray, colors.white},
 }
