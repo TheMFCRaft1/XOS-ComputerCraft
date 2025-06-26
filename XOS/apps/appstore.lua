@@ -1,40 +1,45 @@
 -- /XOS/apps/appstore.lua
+
+local http = require("http")
 os.loadAPI("/XOS/lib/gui.lua")
-os.loadAPI("/XOS/lib/utils.lua")
 
 local function fetchAppList()
-  local tempPath = "/.applist.tmp"
-  if fs.exists(tempPath) then fs.delete(tempPath) end
-  shell.run("wget https://raw.githubusercontent.com/TheMFCRaft1/XOS-ComputerCraft/main/appstore.lua " .. tempPath)
-  local list = dofile(tempPath)
-  fs.delete(tempPath)
-  return list
+  local res = http.get("http://node03.team.the-network.cloud:27022/xos-apps/apps_list.php")
+  if not res then return {} end
+  local content = res.readAll()
+  res.close()
+  local ok, data = pcall(textutils.unserializeJSON, content)
+  return ok and data or {}
 end
 
 local function installApp(app)
-  print("Installiere '" .. app.name .. "'...")
-  shell.run("wget " .. app.appUrl .. " /XOS/apps/" .. app.id .. ".lua")
-  if app.iconUrl then
-    shell.run("wget " .. app.iconUrl .. " /XOS/icons/" .. app.id .. ".icon")
+  print("Installiere " .. app.name .. "...")
+  local base = "http://node03.team.the-network.cloud:27022/xos-apps/apps/" .. app.id .. "/"
+
+  shell.run("wget " .. base .. app.appFile .. " /XOS/apps/" .. app.id:gsub("/", "_") .. ".lua")
+  if app.iconFile then
+    shell.run("wget " .. base .. app.iconFile .. " /XOS/icons/" .. app.id:gsub("/", "_") .. ".icon")
   end
   print("✓ Installiert!")
   sleep(1)
 end
 
 local function showStore()
-  local apps = fetchAppList()
   gui.clear(colors.black)
   term.setCursorPos(2, 2)
   print("== XOS App Store ==")
 
+  local apps = fetchAppList()
   local y = 4
+
   for _, app in ipairs(apps) do
     term.setCursorPos(2, y)
     term.setTextColor(colors.yellow)
     print(app.name)
     term.setCursorPos(4, y + 1)
     term.setTextColor(colors.white)
-    print(app.description:sub(1, 30))
+    print((app.description or "Keine Beschreibung"):sub(1, 30))
+
     gui.registerArea(30, y, 8, 1, function()
       installApp(app)
     end)
@@ -45,7 +50,7 @@ local function showStore()
   end
 end
 
--- Start der App
+-- GUI starten
 showStore()
 while true do
   local e, b, x, y = os.pullEvent("mouse_click")
