@@ -31,22 +31,40 @@ local function showStore()
   local apps = fetchAppList()
   local y = 4
 
-  for _, app in ipairs(apps) do
+for _, app in ipairs(apps) do
     term.setCursorPos(2, y)
     term.setTextColor(colors.yellow)
     print(app.name)
+
     term.setCursorPos(4, y + 1)
     term.setTextColor(colors.white)
     print((app.description or "Keine Beschreibung"):sub(1, 30))
 
-    gui.registerArea(30, y, 8, 1, function()
-      installApp(app)
+    -- Install Button rechts
+    local btnX = math.max(20, #app.name + 5) -- Dynamische Position
+    gui.registerArea(btnX, y, 9, 1, function()
+        installApp(app)
     end)
-    term.setCursorPos(30, y)
-    term.setTextColor(colors.lime)
+
+    term.setCursorPos(btnX, y)
+    term.setTextColor(colors.green)
     term.write("[Install]")
+
     y = y + 3
-  end
+end
+  term.setCursorPos(2, y)
+  term.setTextColor(colors.white)
+  print("Drücke 'q' zum Beenden.")
+
+  -- Event-Handler für Tasteneingaben
+  gui.registerKeyHandler(function(key)
+    if key == "q" then
+      return false -- Beendet die GUI
+    end
+    return true -- Weiterhin Eingaben akzeptieren
+  end)
+
+  gui.render()
 end
 
 -- GUI starten
