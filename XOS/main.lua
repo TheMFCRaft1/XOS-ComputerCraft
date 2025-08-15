@@ -6,16 +6,29 @@ local screenW, screenH = term.getSize()
 local appAreaY = 2
 local appAreaH = screenH - 2
 
+-- Verbesserte App-Ladefunktion
 local function getApps()
+  if not fs.exists("/XOS/apps") then return {} end
   local list = fs.list("/XOS/apps")
   local apps = {}
   for _, file in ipairs(list) do
-    if file:sub(-4) == ".lua" then
+    local path = fs.combine("/XOS/apps", file)
+    if fs.isDir(path) then
+      -- Falls App ein Ordner mit main.lua ist
+      if fs.exists(fs.combine(path, "main.lua")) then
+        table.insert(apps, {
+          id = file,
+          name = file:sub(1, 1):upper() .. file:sub(2),
+          exec = fs.combine(path, "main.lua")
+        })
+      end
+    elseif file:sub(-4) == ".lua" then
+      -- Falls App nur eine einzelne .lua-Datei ist
       local id = file:sub(1, -5)
       table.insert(apps, {
         id = id,
         name = id:sub(1, 1):upper() .. id:sub(2),
-        exec = "/XOS/apps/" .. file
+        exec = fs.combine("/XOS/apps", file)
       })
     end
   end
@@ -32,11 +45,12 @@ local function drawTopBar(notify)
   term.write(time)
 end
 
+-- Neuer Bottom Bar mit Symbolen
 local function drawBottomBar()
   term.setBackgroundColor(colors.gray)
   term.setCursorPos(1, screenH)
   term.setTextColor(colors.black)
-  term.write(" [Home]     [Zurück] ")
+  term.write(" □   < ")
 end
 
 local function drawHomeScreen()
@@ -82,13 +96,11 @@ function launchApp(app)
   local appWin = window.create(term.current(), 1, appAreaY, screenW, appAreaH, false)
   term.redirect(appWin)
 
-  local ok, err = pcall(function()
-    shell.run(app.exec)
-  end)
+  local success = shell.run(app.exec)
 
   term.redirect(term.native())
-  if not ok then
-    print("Fehler: " .. err)
+  if not success then
+    print("Fehler beim Start von " .. app.name)
     sleep(2)
   end
 end
@@ -100,10 +112,10 @@ while true do
   local e, b, x, y = os.pullEvent()
   if e == "mouse_click" then
     if y == screenH then
-      if x >= 2 and x <= 7 then
-        drawHomeScreen()
-      elseif x >= 13 and x <= 22 then
-        drawHomeScreen()
+      if x == 2 then
+        drawHomeScreen() -- Home
+      elseif x == 6 then
+        drawHomeScreen() -- Zurück (hier könnte später History hin)
       end
     else
       gui.handleClick(x, y)
