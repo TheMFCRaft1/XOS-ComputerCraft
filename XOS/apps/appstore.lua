@@ -1,6 +1,5 @@
 -- /XOS/apps/appstore.lua
 
-local http = require("http")
 os.loadAPI("/XOS/lib/gui.lua")
 
 local function fetchAppList()
