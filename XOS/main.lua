@@ -14,7 +14,6 @@ local function getApps()
   for _, file in ipairs(list) do
     local path = fs.combine("/XOS/apps", file)
     if fs.isDir(path) then
-      -- Falls App ein Ordner mit main.lua ist
       if fs.exists(fs.combine(path, "main.lua")) then
         table.insert(apps, {
           id = file,
@@ -23,7 +22,6 @@ local function getApps()
         })
       end
     elseif file:sub(-4) == ".lua" then
-      -- Falls App nur eine einzelne .lua-Datei ist
       local id = file:sub(1, -5)
       table.insert(apps, {
         id = id,
@@ -45,7 +43,6 @@ local function drawTopBar(notify)
   term.write(time)
 end
 
--- Neuer Bottom Bar mit Symbolen
 local function drawBottomBar()
   term.setBackgroundColor(colors.gray)
   term.setCursorPos(1, screenH)
@@ -89,20 +86,16 @@ local function drawHomeScreen()
   end
 end
 
+-- Einfacher direkter App-Start
 function launchApp(app)
-  gui.clear(colors.black)
-  drawTopBar()
-  drawBottomBar()
-  local appWin = window.create(term.current(), 1, appAreaY, screenW, appAreaH, false)
-  term.redirect(appWin)
+  term.setBackgroundColor(colors.black)
+  term.clear()
+  term.setCursorPos(1, 1)
 
-  local success = shell.run(app.exec)
+  shell.run(app.exec)
 
-  term.redirect(term.native())
-  if not success then
-    print("Fehler beim Start von " .. app.name)
-    sleep(2)
-  end
+  -- Nach App-Ende wieder Home anzeigen
+  drawHomeScreen()
 end
 
 -- Main-Loop
@@ -115,7 +108,7 @@ while true do
       if x == 2 then
         drawHomeScreen() -- Home
       elseif x == 6 then
-        drawHomeScreen() -- Zurück (hier könnte später History hin)
+        drawHomeScreen() -- Zurück
       end
     else
       gui.handleClick(x, y)
